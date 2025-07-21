@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development # Use the development stage from Dockerfile.dev
+    container_name: fullstack-dev
+    ports:
+      - '5173:5173' # Frontend (Vite dev server)
+      - '3000:3000' # Backend (Express server)
+    volumes:
+      - ./client:/app/client:delegated # Mount client code
+      - /app/client/node_modules # Anonymous volume for client node_modules
+      - ./server:/app/server:delegated # Mount server code
+      - /app/server/node_modules # Anonymous volume for server node_modules
+    environment:
+      # Example environment variables (adjust as needed)
+      NODE_ENV: development
+      PORT: 3000
+    command: sh -c "cd /app/server && npm run dev & cd /app/client && npm run dev"
+    # This command starts both frontend and backend dev servers concurrently.
+    # The `&` runs them in the background. The `tail -f /dev/null` in Dockerfile.dev
+    # ensures the container doesn't exit if these background processes stop.
+    # For better debugging, you might start them individually in separate terminal windows
+    # or rely on VS Code's remote development features to attach.

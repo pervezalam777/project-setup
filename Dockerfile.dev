@@ -1,0 +1,27 @@
+# Stage 1: Base image for development
+FROM node:20-alpine AS development
+
+WORKDIR /app
+
+# Copy package.json files for caching npm installs
+COPY client/package*.json client/
+COPY server/package*.json server/
+
+# Install client dependencies
+RUN cd client && npm install
+
+# Install server dependencies
+RUN cd server && npm install
+
+# Copy all source code
+COPY . .
+
+# Expose ports for both frontend (Vite) and backend (Express)
+EXPOSE 5173
+EXPOSE 3000
+
+# Command to keep the container running and allow manual starting of services
+# For actual debugging, you'd typically run `docker compose up` and then
+# attach your debugger from your local VS Code to the running container.
+# This CMD is a placeholder; in `docker-compose.dev.yml` we'll use specific commands.
+CMD ["tail", "-f", "/dev/null"]
